@@ -6,6 +6,7 @@
 
 		<title>Postgres JSONB</title>
 
+		<link rel="icon" href="http://www.ocelotconsulting.com/img/logo_small_gray.png">
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/black.css">
 
@@ -29,6 +30,38 @@
 				<section id='slide-1'>
 					<h1>PostgreSQL as a Document Store</h1>
 					<h5><a href="http://www.ocelotconsulting.com/"><img class='logo' src='http://www.ocelotconsulting.com/img/logo_small_gray.png'/> Ocelot Consulting</a></h5>
+					<h6><small>Patrick Byrne</small></h6>
+				</section>
+
+				<section id="the-why">
+					<section><h3>Why do we even want JSON in a Relation Data Store?</h3></section>
+					<section>
+						<h3>Two grate tastes that taste great together!</h3>
+						<img src='./images/two-great-tastes-that-taste-great-together.jpg' />
+					</section>
+					<section>
+						<ul>
+							<li>The indexing and querying ability of SQL</li>
+							<li>ACID compliance</li>
+							<li>The flexability of a NoSQL store</li>
+							<li>
+								The ability to switch data storage paradigms as needed.
+								<ul>
+									<li>Divide a table between fixed columns and JSON</li>
+									<li>Some aspects of the database could be purely SQL based others can be purely NoSQL based</li>
+								</ul>
+							</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Rapid Prototyping</h3>
+						<p>
+							Storing the non-relation aspects of a table as JSONB allows for rapid changes of the stored data without having to make schema changes.
+						</p>
+						<p>
+							By limiting the columns on a table to a subset of the actual data (usually just the primary key and maybe some audit data like last updated date and modified by) the data layer can quickly adapt to changes in the API layer.
+						</p>
+					</section>
 				</section>
 
 				<section id="json-column-type">
@@ -106,7 +139,7 @@ SELECT doc #>> '{property2,subproperty}' FROM SOME_TABLE;
 								JSONB is a binary storage format.
 							</li>
 							<li>
-								There is absolutly no disadvantage to using JSONB instead of JSON.
+								There is absolutly no disadvantage to using JSONB instead of JSON <span style="color: red;">*</span>
 							</li>
 							<li>
 								Keys and values are stored as binary data and retrieved as proper scaler SQL values (Ints come back as Numeric, etc).
@@ -115,6 +148,7 @@ SELECT doc #>> '{property2,subproperty}' FROM SOME_TABLE;
 								Allows for properties of the JSON document to be indexed.
 							</li>
 						</ul>
+						<div><small><em><span style="color: red;">*</span> Some disadvantages may apply</em></small></div>
 					</section>
 					<section>
 						<pre><code>
@@ -224,6 +258,16 @@ UPDATE SOME_TABLE set doc = jsonb_insert(
 -- Exclude true to insert before the given index
 						</code></pre>
 					</section>
+				</section>
+				<section>
+					<h3>Let's take a look at an actual DB and API making use of JSONB columns</h3>
+				</section>
+				<section>
+					<h1>Q & A</h1>
+				</section>
+				<section>
+					<h5>Cat Tax</h5>
+					<img style="max-height: 500px; max-width: 500px;" src="./images/ocelot.jpg" />
 				</section>
 			</div>
 		</div>
