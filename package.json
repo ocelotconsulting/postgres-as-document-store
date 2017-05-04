@@ -1,0 +1,18 @@
+{
+  "name": "@ocelot-consulting/postgres-as-document-store",
+  "version": "1.0.0",
+  "description": "Simple presentation on using PostgreSQL as a document data store.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "presentation",
+    "postgres"
+  ],
+  "author": "Patrick Byrne",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "dependencies": {
+    "reveal.js": "^3.4.1"
+  }
+}

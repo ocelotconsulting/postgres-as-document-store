@@ -1,0 +1,249 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Postgres JSONB</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<link rel="stylesheet" href="css/style.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body id="presentation">
+		<div class="reveal">
+			<div class="slides">
+				<section id='slide-1'>
+					<h1>PostgreSQL as a Document Store</h1>
+					<h5><a href="http://www.ocelotconsulting.com/"><img class='logo' src='http://www.ocelotconsulting.com/img/logo_small_gray.png'/> Ocelot Consulting</a></h5>
+				</section>
+
+				<section id="json-column-type">
+					<section>
+						<h3>The history of the JSON Column Type in Postgres</h3>
+					</section>
+					<section>
+						<h5>The introduction of the JSON column type</h5>
+						<ul>
+							<li>
+								The original JSON column type was introduced in Postgres 9.2 (2012-09-10).
+							</li>
+							<li>
+								It was basically a glorified text column that could validated as JSON.
+							</li>
+							<li>
+								We can pull back or update only the entire document.  JSON column type doesnt even remove excess whitespace!
+							</li>
+							<li>
+								Not all that useful.
+							</li>
+						</ul>
+					</section>
+					<section>
+						<pre><code>
+CREATE TABLE SOME_TABLE ( id BIGSERIAL PRIMARY KEY, doc JSON );
+INSERT INTO SOME_TABLE (doc) VALUES ('{
+	"property1": "value 1",
+	"property2": {
+		"subproperty": "value 2"
+	}
+}');
+SELECT * FROM SOME_TABLE;
+						</code></pre>
+					</section>
+					<section>
+						<h3>Getting a bit more useful</h3>
+						<ul>
+							<li>
+								Postgres 9.3 introduces the <code>-></code>, <code>->></code>, <code>#></code>, and <code>#>></code> operators.
+							</li>
+							<li>
+								This allows us to actually start querying against our JSON data!
+							</li>
+						</ul>
+					</section>
+					<section>
+						<pre><code>
+-- returns the value of doc.property1 as JSON
+SELECT doc -> 'property1' FROM SOME_TABLE;
+
+-- returns the value of doc.property1 as text
+SELECT doc ->> 'property1' FROM SOME_TABLE;
+
+-- returns the value of doc.property2.subproperty as JSON
+SELECT doc #> '{property2,subproperty}' FROM SOME_TABLE;
+
+-- returns the value of doc.property2.subproperty as text
+SELECT doc #>> '{property2,subproperty}' FROM SOME_TABLE;
+						</code></pre>
+					</section>
+				</section>
+
+				<section id="jsonb-column-type">
+					<section>
+						<h3>JSONB brings soom much needed efficency</h3>
+					</section>
+					<section>
+						<h5>The introduction of the JSONB column type</h5>
+						<ul>
+							<li>
+								The JSONB column type was introduced in Postgres 9.4 (2014-12-18).
+							</li>
+							<li>
+								JSONB is a binary storage format.
+							</li>
+							<li>
+								There is absolutly no disadvantage to using JSONB instead of JSON.
+							</li>
+							<li>
+								Keys and values are stored as binary data and retrieved as proper scaler SQL values (Ints come back as Numeric, etc).
+							</li>
+							<li>
+								Allows for properties of the JSON document to be indexed.
+							</li>
+						</ul>
+					</section>
+					<section>
+						<pre><code>
+CREATE TABLE SOME_TABLE ( id BIGSERIAL PRIMARY KEY, doc JSONB );
+INSERT INTO SOME_TABLE (doc) VALUES ('{
+	"property1": "value 1",
+	"property2": {
+		"subproperty": "value 2",
+		"subproperty2": "value 3"
+	}
+}');
+SELECT * FROM SOME_TABLE;
+						</code></pre>
+					</section>
+					<section>
+						<h5>Additioinal functions to support JSONB</h5>
+						<ul>
+							<li>
+								<code>json_build_object()</code>
+							</li>
+							<li>
+								<code>json_build_array()</code>
+							</li>
+							<li>
+								<code>json_object()</code>
+							</li>
+							<li>
+								Cast to JSONB <code>(::jsonb)</code>
+							</li>
+							<li>
+								Contains: <code>@></code>, <code><@</code>
+							</li>
+							<li>
+								Exist: <code>?</code>, <code>?|</code>, <code>?&</code>
+							</li>
+						</ul>
+					</section>
+					<section>
+						<pre><code>
+-- Select the text value of doc.property1 for any document
+-- that has doc.property2.subproperty = "value 2"
+SELECT doc ->> 'property1' FROM SOME_TABLE
+WHERE doc -> 'property2' @> '{"subproperty": "value 2"}';
+
+-- Select all documents that have a property3
+SELECT doc ->> 'property1' FROM SOME_TABLE
+WHERE doc ? 'property3';
+						</code></pre>
+					</section>
+					<section>
+						<h3>Postgres 9.5 (2016-01-07)</h3>
+						<ul>
+							<li>
+								Added <code>jsonb_pretty()</code> to pretty print the JSONB data.
+							</li>
+							<li>
+								Added the ability to delete document properties with <code>-</code> and <code>#-</code>
+							</li>
+							<li>
+								Added the ability to concatenate document properties with <code>||</code>
+							</li>
+							<li>
+								Added the ability to insert or update a property with <code>jsonb_set()</code>
+							</li>
+						</ul>
+					</section>
+					<section>
+						<pre><code>-- Delete a property from the document
+UPDATE SOME_TABLE set doc = doc-'property1';
+
+-- Delete a property along a path
+UPDATE SOME_TABLE set doc = doc#-'{property2,subproperty}';
+
+-- Add a new property
+UPDATE SOME_TABLE set doc = doc || '{"newProperty": "new value"}';
+
+-- Insert or Update a property
+UPDATE SOME_TABLE set doc = jsonb_set(
+	doc, '{property2,subproperty2}',
+	jsonb_object('some value'), true
+)</code></pre>
+					</section>
+					<section>
+						<h3>Postgres 9.6 (2016-09-29)</h3>
+						<ul>
+							<li>
+								Added <code>jsonb_insert()</code>.
+							</li>
+							<li>
+								<code>jsonb_insert()</code> works similarly to <code>jsonb_set()</code> but allows for items to be inserted at a given point in a JSONB array value.
+							</li>
+						</ul>
+					</section>
+					<section>
+						<pre><code>INSERT INTO SOME_TABLE (doc) VALUES ('{
+	"property1": "value 1",
+	"property2": [{
+		"subproperty": "value 2"
+	}]
+}');
+
+-- Insert a value into doc.property2 after index 0
+UPDATE SOME_TABLE set doc = jsonb_insert(
+	doc, '{property2,0}',
+	json_object('{"subproperty": "new value"}'), true
+)
+-- Exclude true to insert before the given index
+						</code></pre>
+					</section>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				history: true,
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
