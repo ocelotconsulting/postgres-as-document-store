@@ -36,14 +36,14 @@
 				<section id="the-why">
 					<section><h3>Why do we even want JSON in a Relation Data Store?</h3></section>
 					<section>
-						<h3>Two grate tastes that taste great together!</h3>
+						<h3>Two great tastes that taste great together!</h3>
 						<img src='./images/two-great-tastes-that-taste-great-together.jpg' />
 					</section>
 					<section>
 						<ul>
 							<li>The indexing and querying ability of SQL</li>
 							<li>ACID compliance</li>
-							<li>The flexability of a NoSQL store</li>
+							<li>The flexibility of a NoSQL store</li>
 							<li>
 								The ability to switch data storage paradigms as needed.
 								<ul>
@@ -56,7 +56,7 @@
 					<section>
 						<h3>Rapid Prototyping</h3>
 						<p>
-							Storing the non-relation aspects of a table as JSONB allows for rapid changes of the stored data without having to make schema changes.
+							Storing the non-relational aspects of a table as JSONB allows for rapid changes of the stored data without having to make schema changes.
 						</p>
 						<p>
 							By limiting the columns on a table to a subset of the actual data (usually just the primary key and maybe some audit data like last updated date and modified by) the data layer can quickly adapt to changes in the API layer.
@@ -78,7 +78,7 @@
 								It was basically a glorified text column that could validated as JSON.
 							</li>
 							<li>
-								We can pull back or update only the entire document.  JSON column type doesnt even remove excess whitespace!
+								We can pull back or update only the entire document.  JSON column type doesn't even remove excess whitespace!
 							</li>
 							<li>
 								Not all that useful.
@@ -139,10 +139,10 @@ SELECT doc #>> '{property2,subproperty}' FROM SOME_TABLE;
 								JSONB is a binary storage format.
 							</li>
 							<li>
-								There is absolutly no disadvantage to using JSONB instead of JSON <span style="color: red;">*</span>
+								There is absolutely no disadvantage to using JSONB instead of JSON <span style="color: red;">*</span>
 							</li>
 							<li>
-								Keys and values are stored as binary data and retrieved as proper scaler SQL values (Ints come back as Numeric, etc).
+								Keys and values are stored as binary data and retrieved as proper scalar SQL values (Ints come back as Numeric, etc).
 							</li>
 							<li>
 								Allows for properties of the JSON document to be indexed.
@@ -164,7 +164,7 @@ SELECT * FROM SOME_TABLE;
 						</code></pre>
 					</section>
 					<section>
-						<h5>Additioinal functions to support JSONB</h5>
+						<h5>Additional functions to support JSONB</h5>
 						<ul>
 							<li>
 								<code>json_build_object()</code>
